@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct BooksAppApp: App {
+    @StateObject var router: NavigationManager = NavigationManager()
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainPageView(mainPageVM: MainPageViewModel())
+                .environmentObject(NavigationManager())
         }
     }
 }
