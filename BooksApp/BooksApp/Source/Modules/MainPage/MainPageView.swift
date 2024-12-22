@@ -17,7 +17,65 @@ struct MainPageView: View {
                 .black87
                 .ignoresSafeArea()
             
-            content()
+            if mainPageVM.isLoading {
+                ProgressView {
+                    Text("Books Are Loading")
+                        .font(.headline)
+                        .foregroundStyle(.myWhite)
+                }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .foregroundStyle(.myGray.opacity(0.2))
+                )
+            } else if let networkError = mainPageVM.networkError {
+                // Show error messages based on the network error
+                VStack {
+                    switch networkError {
+                    case .invalidURL:
+                        Text("The URL is invalid. Please try again later.")
+                            .font(.headline)
+                            .foregroundStyle(.myWhite)
+                            .multilineTextAlignment(.center)
+                            .padding()
+                    case .badResponse:
+                        Text("The server responded with an error. Please try again.")
+                            .font(.headline)
+                            .foregroundStyle(.myWhite)
+                            .multilineTextAlignment(.center)
+                            .padding()
+                    case .decodingError:
+                        Text("Failed to process the data. Please try again.")
+                            .font(.headline)
+                            .foregroundStyle(.myWhite)
+                            .multilineTextAlignment(.center)
+                            .padding()
+                    case .unknownError(let message):
+                        Text("An unknown error occurred: \(message)")
+                            .font(.headline)
+                            .foregroundStyle(.myWhite)
+                            .multilineTextAlignment(.center)
+                            .padding()
+                    }
+                    
+                    Button(action: {
+                        Task {
+                            await mainPageVM.getBooks()
+                        }
+                    }) {
+                        Text("Retry")
+                            .font(.headline)
+                            .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .foregroundStyle(.myGray)
+                            )
+                            .foregroundStyle(.myWhite)
+                    }
+                }
+            } else {
+                content()
+            }
         }
         .navigationTitle("Books")
     }
