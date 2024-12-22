@@ -23,7 +23,12 @@ struct MainPageView: View {
     }
     
     private func content() -> some View {
-        VStack {
+        VStackLayout(alignment: .leading, spacing: 16) {
+            filteringCategories()
+            
+            sortingBooks()
+                .padding(.horizontal)
+            
             bookList()
         }
     }
@@ -41,53 +46,51 @@ struct MainPageView: View {
         .listStyle(PlainListStyle())
         .searchable(text: $mainPageVM.searchQuery, prompt: "Search Book")
     }
-}
-
-extension BookCell {
-    enum Constants {
-        static let hStackSmallSpacing: CGFloat? = 10
-        static let vStackSmallSpacing: CGFloat? = 8
-    }
-}
-
-struct BookCell: View {
-    let book: Book
-    let action: () -> Void
-    var body: some View {
-        HStack {
-            HStack(alignment: .top, spacing: Constants.hStackSmallSpacing) {
-                if let imageUrl = URL(string: book.image) {
-                    BookImage(url: imageUrl)
-                }
-                
-                VStackLayout(alignment: .leading, spacing: Constants.vStackSmallSpacing) {
-                    Text(book.title)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(.myWhite)
-                    
-                    Text(book.authors)
-                        .font(.system(size: 12, weight: .regular))
-                        .foregroundStyle(.myWhite)
-                    
-                    Text(book.subtitle)
-                        .font(.system(size: 10, weight: .regular))
-                        .foregroundStyle(.myGray)
-                }
-                
-                
+    
+    private func filteringCategories() -> some View {
+        Menu {
+            Button("Search Book By Title") {
+                mainPageVM.searchBy = .title
+                mainPageVM.searchByText = "Search Book By Title"
             }
-            
+            Button("Search Book By Author Name") {
+                mainPageVM.searchBy = .authorName
+                mainPageVM.searchByText = "Search Book By Author Name"
+            }
+        } label: {
+            Text(mainPageVM.searchByText)
+                .font(.headline)
+                .foregroundStyle(.myWhite)
+                .padding(5)
+                .background(
+                    RoundedRectangle(cornerRadius: 0)
+                        .fill(Color.mySecondary)
+                        .cornerRadius(20, corners: [.bottomLeft, .topRight])
+                )
+        }
+        .padding(.horizontal)
+    }
+    
+    private func sortingBooks() -> some View {
+        HStack {
             Spacer()
             
             Button {
-                action()
+                withAnimation {
+                    mainPageVM.isSortedAlphabetically.toggle()
+                }
             } label: {
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(.mySecondary)
+                Text("Sort Alphabetically")
+                    .font(.footnote)
+                    .foregroundStyle(mainPageVM.isSortedAlphabetically ? .myWhite : .myGray)
+                    .padding(5)
+                    .background(
+                        RoundedRectangle(cornerRadius: 0)
+                            .fill(mainPageVM.isSortedAlphabetically ? Color.mySecondary : Color.mySecondary.opacity(0.5))
+                            .cornerRadius(20, corners: [.bottomRight, .topLeft])
+                    )
             }
-            .buttonStyle(PlainButtonStyle())
         }
-        
     }
 }
 
