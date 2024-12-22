@@ -9,7 +9,7 @@ import SwiftUI
 
 final class NavigationManager: ObservableObject {
     public enum Destination: Codable, Hashable {
-        case result(success: Bool)
+        case details(id: String)
     }
     
     @Published var navPath = NavigationPath()

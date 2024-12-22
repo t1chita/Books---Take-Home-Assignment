@@ -20,7 +20,6 @@ struct MainPageView: View {
             content()
         }
         .navigationTitle("Books")
-        
     }
     
     private func content() -> some View {
@@ -30,7 +29,7 @@ struct MainPageView: View {
     }
     
     private func bookList() -> some View {
-        List(mainPageVM.books.books) { book in
+        List(mainPageVM.filteredBooks) { book in
             BookCell(book: book) {
                 print(book.id)
             }
@@ -40,6 +39,7 @@ struct MainPageView: View {
         .background(Color.clear)
         .scrollContentBackground(.hidden)
         .listStyle(PlainListStyle())
+        .searchable(text: $mainPageVM.searchQuery, prompt: "Search Book")
     }
 }
 
@@ -87,9 +87,10 @@ struct BookCell: View {
             }
             .buttonStyle(PlainButtonStyle())
         }
-
+        
     }
 }
+
 #Preview {
     MainPageView(mainPageVM: MainPageViewModel())
         .environmentObject(NavigationManager())
